@@ -1,6 +1,5 @@
 package com.innowise.authenticationservice.dto;
 
-import jakarta.persistence.Column;
 
 public record CardResponse(
         Long id,
@@ -9,4 +8,5 @@ public record CardResponse(
         String expiryDate,
         String cardHolderName
 ) {
+
 }

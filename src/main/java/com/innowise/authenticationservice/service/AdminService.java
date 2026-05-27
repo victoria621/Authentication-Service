@@ -63,6 +63,7 @@ public class AdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         user.setActive(true);
+        userRepository.save(user);
     }
 
     @Transactional
@@ -70,6 +71,7 @@ public class AdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException (USER_NOT_FOUND_MESSAGE));
         user.setActive(false);
+        userRepository.save(user);
     }
 
     public List<OrderResponse> getAllOrders() {

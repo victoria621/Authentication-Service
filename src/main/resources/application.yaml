@@ -19,3 +19,5 @@ jwt:
   secret: mySuperSecretKey1234567890123456789012345678901234567890
   access-expiration: 900000
   refresh-expiration: 604800000
+
+kind: Application
