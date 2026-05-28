@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         String token = authHeader.substring("Bearer ".length());
-        if(!jwtUtil.validateToken(token)) {
+        if(jwtUtil.validateToken(token) == false) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
