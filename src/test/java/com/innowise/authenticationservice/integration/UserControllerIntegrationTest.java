@@ -5,6 +5,7 @@ import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.UserRequest;
 import com.innowise.authenticationservice.dto.UserResponse;
 import com.innowise.authenticationservice.entity.Role;
+import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +38,15 @@ class UserControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
     private String accessToken;
     private Long userId;
 
     @BeforeEach
     void setUp() throws Exception {
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
 
         UserRequest registerRequest = new UserRequest("testuser", "password123");
@@ -58,7 +63,6 @@ class UserControllerIntegrationTest {
 
         accessToken = authResponse.accessToken();
 
-        // Получаем userId через отдельный запрос к /users
         MvcResult userResult = mockMvc.perform(get("/users")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())

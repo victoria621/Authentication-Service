@@ -6,6 +6,7 @@ import com.innowise.authenticationservice.dto.UserRequest;
 import com.innowise.authenticationservice.dto.UserResponse;
 import com.innowise.authenticationservice.entity.Role;
 import com.innowise.authenticationservice.entity.User;
+import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import com.innowise.authenticationservice.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,10 +42,14 @@ class AdminControllerIntegrationTest {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
+
     private String adminAccessToken;
 
     @BeforeEach
     void setUp() throws Exception {
+        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
 
         UserRequest registerRequest = new UserRequest("adminuser", "adminpass");
@@ -74,7 +79,7 @@ class AdminControllerIntegrationTest {
 
     @Test
     void getAllUsers_ShouldReturnUserList() throws Exception {
-        // Создаём дополнительного пользователя
+
         UserRequest userRequest = new UserRequest("regular", "pass123");
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
