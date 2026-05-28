@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  SONAR_ORG: viktoris23
+  SONAR_ORG: viktoria621
   SONAR_PROJECT: Authentication-Service
 
 jobs:
