@@ -10,24 +10,24 @@ import lombok.Setter;
 @Entity
 @Table(name = "users")
 public class User{
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "id")
-        private Long id;
-        @NotBlank
-        @Column(name = "login")
-        private String login;
-        @NotBlank
-        @Column(name = "password_hash")
-        private String passwordHash;
-        @NotBlank
-        @Column(name = "salt")
-        private String salt;
-        @Enumerated(EnumType.STRING)
-        @Column(name = "role")
-        private Role role;
-        @Column(name = "active")
-        private boolean active;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @NotBlank
+    @Column(name = "login")
+    private String login;
+    @NotBlank
+    @Column(name = "password_hash")
+    private String passwordHash;
+    @NotBlank
+    @Column(name = "salt")
+    private String salt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+    @Column(name = "active")
+    private boolean active;
 
     public User() {}
 
