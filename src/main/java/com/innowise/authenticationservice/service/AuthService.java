@@ -69,6 +69,7 @@ public class AuthService {
         String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
+        deleteOldRefreshTokens(user);
         saveRefreshToken(refreshToken, user);
 
         return new  AuthResponse(accessToken, refreshToken);
@@ -87,6 +88,8 @@ public class AuthService {
         String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
 
+        refreshTokenRepository.delete(refreshTokenEntity);
+        refreshTokenRepository.flush();
         saveRefreshToken(refreshToken, user);
 
         return  new  AuthResponse(accessToken, refreshToken);
@@ -99,6 +102,11 @@ public class AuthService {
         refreshTokenEntity.setUser(user);
         refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(7));
         refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    private void deleteOldRefreshTokens(User user) {
+        refreshTokenRepository.deleteAllByUser(user);
+        refreshTokenRepository.flush();
     }
 }
 

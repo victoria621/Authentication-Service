@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class RefreshToken{
         @Id
         @Column(name = "id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "user_id")

@@ -20,13 +20,13 @@ public class AdminController {
     private final AdminService adminService;
     private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-    @GetMapping
+    @GetMapping("/users")
     public List<UserResponse> getAllUsers(){
         log.info("getAllUsers");
         return adminService.getAllUsers();
     }
 
-    @PatchMapping("/{id}/activate")
+    @PatchMapping("/users/{id}/activate")
     public ResponseEntity<Void> activateUser(
             @PathVariable("id") Long id
     ) {
@@ -35,7 +35,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/deactivate")
+    @PatchMapping("/users/{id}/deactivate")
     public ResponseEntity<Void> deactivateUser(
             @PathVariable("id") Long id
     ) {
