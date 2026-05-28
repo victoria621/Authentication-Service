@@ -1,6 +1,5 @@
 package com.innowise.authenticationservice.controller;
 
-import com.innowise.authenticationservice.dto.AuthRequest;
 import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.RefreshTokenRequest;
 import com.innowise.authenticationservice.dto.UserRequest;

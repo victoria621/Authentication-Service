@@ -11,6 +11,8 @@ import com.innowise.authenticationservice.repository.UserRepository;
 import com.innowise.authenticationservice.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +76,6 @@ class AdminControllerIntegrationTest {
 
         adminAccessToken = authResponse.accessToken();
 
-        System.out.println("Role in token: " + jwtUtil.extractRole(adminAccessToken));
     }
 
     @Test
@@ -138,31 +139,10 @@ class AdminControllerIntegrationTest {
         assertThat(updatedUser.isActive()).isFalse();
     }
 
-    @Test
-    void getAllOrders_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/admin/orders")
-                        .header("Authorization", "Bearer " + adminAccessToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        assertThat(response).isEqualTo("[]");
-    }
-
-    @Test
-    void getAllCards_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/admin/cards")
-                        .header("Authorization", "Bearer " + adminAccessToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        assertThat(response).isEqualTo("[]");
-    }
-
-    @Test
-    void getAllPayments_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/admin/payments")
+    @ParameterizedTest
+    @ValueSource(strings = {"/cards", "/orders", "/payments"})
+    void getAllResources_ShouldReturnEmptyList(String endpoint) throws Exception {
+        MvcResult result = mockMvc.perform(get("/admin" + endpoint)
                         .header("Authorization", "Bearer " + adminAccessToken))
                 .andExpect(status().isOk())
                 .andReturn();

@@ -9,6 +9,8 @@ import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -97,31 +99,10 @@ class UserControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-    void getMyCards_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/users/cards")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        assertThat(response).isEqualTo("[]");
-    }
-
-    @Test
-    void getMyOrders_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/users/orders")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        assertThat(response).isEqualTo("[]");
-    }
-
-    @Test
-    void getMyPayments_ShouldReturnEmptyList() throws Exception {
-        MvcResult result = mockMvc.perform(get("/users/payments")
+    @ParameterizedTest
+    @ValueSource(strings = {"/cards", "/orders", "/payments"})
+    void getMyResources_ShouldReturnEmptyList(String endpoint) throws Exception {
+        MvcResult result = mockMvc.perform(get("/users" + endpoint)
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andReturn();

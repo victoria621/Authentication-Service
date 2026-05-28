@@ -1,7 +1,6 @@
 package com.innowise.authenticationservice.controller;
 
 import com.innowise.authenticationservice.dto.UserResponse;
-import com.innowise.authenticationservice.entity.User;
 import com.innowise.authenticationservice.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
