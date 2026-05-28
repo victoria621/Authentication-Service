@@ -5,8 +5,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -38,7 +38,7 @@ class ValidationTest {
         AuthRequest request = new AuthRequest("", "password123");
         Set<ConstraintViolation<AuthRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("login");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("login");
     }
 
     @Test
@@ -47,7 +47,7 @@ class ValidationTest {
         AuthRequest request = new AuthRequest("john.doe", "");
         Set<ConstraintViolation<AuthRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("password");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("password");
     }
 
     @Test
@@ -57,7 +57,6 @@ class ValidationTest {
         Set<ConstraintViolation<AuthRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
     }
-
 
     @Test
     @DisplayName("Should validate valid UserRequest")
@@ -73,7 +72,9 @@ class ValidationTest {
         UserRequest request = new UserRequest("", "password123");
         Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isNotNull();
+        ConstraintViolation<UserRequest> violation = violations.iterator().next();
+        assertThat(violation.getPropertyPath()).hasToString("login");
+        assertThat(violation.getMessage()).isNotNull();
     }
 
     @Test
@@ -82,8 +83,8 @@ class ValidationTest {
         UserRequest request = new UserRequest("john.doe", "");
         Set<ConstraintViolation<UserRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("password");
     }
-
 
     @Test
     @DisplayName("Should validate valid ItemRequest")
@@ -99,7 +100,7 @@ class ValidationTest {
         ItemRequest request = new ItemRequest("Laptop", "Description", null);
         Set<ConstraintViolation<ItemRequest>> violations = validator.validate(request);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("price");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("price");
     }
 
     @Test
@@ -107,9 +108,8 @@ class ValidationTest {
     void shouldAcceptItemRequestWithNullNameAndDescription() {
         ItemRequest request = new ItemRequest(null, null, new BigDecimal("99.99"));
         Set<ConstraintViolation<ItemRequest>> violations = validator.validate(request);
-        assertThat(violations).isEmpty(); // name and description are not @NotBlank
+        assertThat(violations).isEmpty();
     }
-
 
     @Test
     @DisplayName("Should validate valid ItemResponse")
@@ -125,8 +125,9 @@ class ValidationTest {
         ItemResponse response = new ItemResponse(1L, "Laptop", "Description", null, null);
         Set<ConstraintViolation<ItemResponse>> violations = validator.validate(response);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("price");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("price");
     }
+
 
     @Test
     @DisplayName("Should validate valid UserResponse")
@@ -142,7 +143,7 @@ class ValidationTest {
         UserResponse response = new UserResponse(null, "john.doe", null, true);
         Set<ConstraintViolation<UserResponse>> violations = validator.validate(response);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("id");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("id");
     }
 
     @Test
@@ -151,6 +152,6 @@ class ValidationTest {
         UserResponse response = new UserResponse(1L, "", null, true);
         Set<ConstraintViolation<UserResponse>> violations = validator.validate(response);
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getPropertyPath().toString()).isEqualTo("login");
+        assertThat(violations.iterator().next().getPropertyPath()).hasToString("login");
     }
 }
