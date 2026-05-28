@@ -15,7 +15,6 @@ import com.innowise.authenticationservice.repository.OrderRepository;
 import com.innowise.authenticationservice.repository.PaymentRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import com.innowise.authenticationservice.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,11 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,85 +59,46 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private User user;
-    private UserResponse userResponse;
-    private Card card;
-    private CardResponse cardResponse;
-    private Order order;
-    private OrderResponse orderResponse;
-    private Payment payment;
-    private PaymentResponse paymentResponse;
-
-    @BeforeEach
-    void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setLogin("testuser");
-        user.setRole(Role.USER);
-        user.setActive(true);
-
-        userResponse = new UserResponse(1L, "testuser", Role.USER, true);
-
-        card = new Card();
-        card.setId(1L);
-        card.setUserId(1L);
-        card.setCardNumber("1234-5678-9012-3456");
-        card.setCardHolderName("Test User");
-        card.setExpiryDate("12/25");
-
-        cardResponse = new CardResponse(1L, 1L, "1234-5678-9012-3456", "12/25", "Test User");
-
-        order = new Order();
-        order.setId(1L);
-        order.setUserId(1L);
-        order.setTotalPrice(BigDecimal.valueOf(100.0));
-        order.setStatus(OrderStatus.CANCELLED);
-
-        orderResponse = new OrderResponse(1L, 1L, BigDecimal.valueOf(100.0), OrderStatus.PAID, LocalDateTime.now());
-
-        payment = new Payment();
-        payment.setId(1L);
-        payment.setOrderId(1L);
-        payment.setAmount(BigDecimal.valueOf(100.0));
-        payment.setStatus(PaymentStatus.COMPLETED);
-        payment.setPaymentMethod("CARD");
-        payment.setCreatedAt(LocalDateTime.now());
-
-        paymentResponse = new PaymentResponse(
-                1L, 1L, BigDecimal.valueOf(100.0),
-                PaymentStatus.COMPLETED, "CARD", LocalDateTime.now()
-        );
-    }
-
     @Test
     void getUserById_ShouldReturnUserResponse_WhenUserExists() {
+        User user = new User();
+        user.setId(1L);
+        user.setLogin("testuser");
+        UserResponse expectedResponse = new UserResponse(1L, "testuser", Role.USER, true);
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userResponse);
+        when(userMapper.toDto(user)).thenReturn(expectedResponse);
 
         UserResponse result = userService.getUserById(1L);
 
-        assertNotNull(result);
-        assertEquals(1L, result.id());
-        assertEquals("testuser", result.login());
+        assertThat(result).isEqualTo(expectedResponse);
+        assertThat(result.id()).isEqualTo(1L);
+        assertThat(result.login()).isEqualTo("testuser");
     }
 
     @Test
     void getUserById_ShouldThrowException_WhenUserNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(99L));
+        assertThatThrownBy(() -> userService.getUserById(99L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("User not found");
     }
 
     @Test
     void getMyCards_ShouldReturnCardList() {
+        Card card = new Card();
+        card.setId(1L);
+        card.setUserId(1L);
+        CardResponse expectedResponse = new CardResponse(1L, 1L, "1234567890123456", "12/25", "Test User");
+
         when(cardRepository.findByUserId(1L)).thenReturn(List.of(card));
-        when(cardMapper.toDtoList(List.of(card))).thenReturn(List.of(cardResponse));
+        when(cardMapper.toDtoList(List.of(card))).thenReturn(List.of(expectedResponse));
 
         List<CardResponse> result = userService.getMyCards(1L);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("1234-5678-9012-3456", result.get(0).cardNumber());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).cardNumber()).isEqualTo("1234567890123456");
     }
 
     @Test
@@ -148,20 +108,23 @@ class UserServiceTest {
 
         List<CardResponse> result = userService.getMyCards(1L);
 
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertThat(result).isEmpty();
     }
 
     @Test
     void getMyOrders_ShouldReturnOrderList() {
+        Order order = new Order();
+        order.setId(1L);
+        order.setUserId(1L);
+        OrderResponse expectedResponse = new OrderResponse(1L, 1L, BigDecimal.valueOf(100), OrderStatus.PAID, null);
+
         when(orderRepository.findByUserId(1L)).thenReturn(List.of(order));
-        when(orderMapper.toDtoList(List.of(order))).thenReturn(List.of(orderResponse));
+        when(orderMapper.toDtoList(List.of(order))).thenReturn(List.of(expectedResponse));
 
         List<OrderResponse> result = userService.getMyOrders(1L);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(BigDecimal.valueOf(100.0), result.get(0).totalPrice());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).totalPrice()).isEqualByComparingTo("100");
     }
 
     @Test
@@ -171,22 +134,26 @@ class UserServiceTest {
 
         List<OrderResponse> result = userService.getMyOrders(1L);
 
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertThat(result).isEmpty();
     }
 
     @Test
     void getMyPayments_ShouldReturnPaymentList() {
+        Order order = new Order();
+        order.setId(1L);
+        Payment payment = new Payment();
+        payment.setId(1L);
+        payment.setOrderId(1L);
+        PaymentResponse expectedResponse = new PaymentResponse(1L, 1L, BigDecimal.valueOf(100), PaymentStatus.COMPLETED, "CARD", null);
+
         when(orderRepository.findByUserId(1L)).thenReturn(List.of(order));
         when(paymentRepository.findByOrderIdIn(List.of(1L))).thenReturn(List.of(payment));
-        when(paymentMapper.toDtoList(List.of(payment))).thenReturn(List.of(paymentResponse));
+        when(paymentMapper.toDtoList(List.of(payment))).thenReturn(List.of(expectedResponse));
 
         List<PaymentResponse> result = userService.getMyPayments(1L);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(BigDecimal.valueOf(100.0), result.get(0).amount());
-        assertEquals("CARD", result.get(0).paymentMethod());
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).amount()).isEqualByComparingTo("100");
     }
 
     @Test
@@ -195,7 +162,7 @@ class UserServiceTest {
 
         List<PaymentResponse> result = userService.getMyPayments(1L);
 
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertThat(result).isEmpty();
+        verify(paymentRepository, never()).findByOrderIdIn(any());
     }
 }

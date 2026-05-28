@@ -1,4 +1,4 @@
-package com.innowise.authenticationservice.unit;
+package com.innowise.authenticationservice.service;
 
 import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.RefreshTokenRequest;
@@ -11,8 +11,6 @@ import com.innowise.authenticationservice.exception.ResourceNotFoundException;
 import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import com.innowise.authenticationservice.security.JwtUtil;
-import com.innowise.authenticationservice.service.AuthService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +21,8 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,102 +41,111 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-    private UserRequest userRequest;
-    private User user;
-    private String accessToken;
-    private String refreshToken;
-
-    @BeforeEach
-    void setUp() {
-        userRequest = new UserRequest("testuser", "password123");
-
-        user = new User();
-        user.setId(1L);
-        user.setLogin("testuser");
-        user.setPasswordHash(BCrypt.hashpw("password123" + "test-salt", BCrypt.gensalt()));
-        user.setSalt("test-salt");
-        user.setRole(Role.USER);
-        user.setActive(true);
-
-        accessToken = "test.access.token";
-        refreshToken = "test.refresh.token";
-    }
-
     @Test
     void register_ShouldCreateUserAndReturnTokens() {
-        when(userRepository.findByLogin(userRequest.login())).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtUtil.generateAccessToken(any(User.class))).thenReturn(accessToken);
-        when(jwtUtil.generateRefreshToken(any(User.class))).thenReturn(refreshToken);
+        UserRequest request = new UserRequest("newuser", "password123");
+        when(userRepository.findByLogin("newuser")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(1L);
+            return u;
+        });
+        when(jwtUtil.generateAccessToken(any(User.class))).thenReturn("access.token");
+        when(jwtUtil.generateRefreshToken(any(User.class))).thenReturn("refresh.token");
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(new RefreshToken());
 
-        AuthResponse response = authService.register(userRequest);
+        AuthResponse response = authService.register(request);
 
-        assertNotNull(response);
-        assertEquals(accessToken, response.accessToken());
-        assertEquals(refreshToken, response.refreshToken());
+        assertThat(response.accessToken()).isEqualTo("access.token");
+        assertThat(response.refreshToken()).isEqualTo("refresh.token");
         verify(userRepository).save(any(User.class));
         verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
 
     @Test
     void register_ShouldThrowExceptionWhenLoginExists() {
-        when(userRepository.findByLogin(userRequest.login())).thenReturn(Optional.of(user));
+        UserRequest request = new UserRequest("existinguser", "password123");
+        when(userRepository.findByLogin("existinguser")).thenReturn(Optional.of(new User()));
 
-        assertThrows(BusinessException.class, () -> authService.register(userRequest));
+        assertThatThrownBy(() -> authService.register(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Login already exists");
+
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void login_ShouldReturnTokensWhenCredentialsValid() {
-        when(userRepository.findByLogin(userRequest.login())).thenReturn(Optional.of(user));
-        when(jwtUtil.generateAccessToken(user)).thenReturn(accessToken);
-        when(jwtUtil.generateRefreshToken(user)).thenReturn(refreshToken);
+        UserRequest request = new UserRequest("testuser", "password123");
+        User user = new User();
+        user.setId(1L);
+        user.setLogin("testuser");
+        user.setSalt("testsalt");
+        String passwordWithSalt = "password123testsalt";
+        user.setPasswordHash(BCrypt.hashpw(passwordWithSalt, BCrypt.gensalt()));
+        user.setRole(Role.USER);
+        user.setActive(true);
+
+        when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
+        when(jwtUtil.generateAccessToken(user)).thenReturn("access.token");
+        when(jwtUtil.generateRefreshToken(user)).thenReturn("refresh.token");
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(new RefreshToken());
 
-        AuthResponse response = authService.login(userRequest);
+        AuthResponse response = authService.login(request);
 
-        assertNotNull(response);
-        assertEquals(accessToken, response.accessToken());
-        assertEquals(refreshToken, response.refreshToken());
+        assertThat(response.accessToken()).isEqualTo("access.token");
+        assertThat(response.refreshToken()).isEqualTo("refresh.token");
+        verify(refreshTokenRepository).deleteAllByUser(user);
     }
 
     @Test
     void login_ShouldThrowExceptionWhenUserNotFound() {
-        when(userRepository.findByLogin(userRequest.login())).thenReturn(Optional.empty());
+        UserRequest request = new UserRequest("nonexistent", "password123");
+        when(userRepository.findByLogin("nonexistent")).thenReturn(Optional.empty());
 
-        assertThrows(BusinessException.class, () -> authService.login(userRequest));
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("User not found");
     }
 
     @Test
     void login_ShouldThrowExceptionWhenPasswordWrong() {
-        UserRequest wrongPasswordRequest = new UserRequest("testuser", "wrongpassword");
-        when(userRepository.findByLogin(wrongPasswordRequest.login())).thenReturn(Optional.of(user));
+        UserRequest request = new UserRequest("testuser", "wrongpassword");
+        User user = new User();
+        user.setLogin("testuser");
+        user.setSalt("testsalt");
+        String correctPasswordHash = BCrypt.hashpw("correctpasswordtestsalt", BCrypt.gensalt());
+        user.setPasswordHash(correctPasswordHash);
 
-        assertThrows(BusinessException.class, () -> authService.login(wrongPasswordRequest));
+        when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> authService.login(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Wrong password");
     }
 
     @Test
     void refresh_ShouldReturnNewTokensWhenTokenValid() {
-        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
+        RefreshTokenRequest request = new RefreshTokenRequest("valid.refresh.token");
+        User user = new User();
+        user.setId(1L);
+        user.setLogin("testuser");
+
         RefreshToken refreshTokenEntity = new RefreshToken();
-        refreshTokenEntity.setToken(refreshToken);
+        refreshTokenEntity.setToken("valid.refresh.token");
         refreshTokenEntity.setUser(user);
         refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(7));
 
-        String newAccessToken = "new.access.token";
-        String newRefreshToken = "new.refresh.token";
-
-        when(refreshTokenRepository.findByToken(refreshToken)).thenReturn(Optional.of(refreshTokenEntity));
-        when(jwtUtil.generateAccessToken(user)).thenReturn(newAccessToken);
-        when(jwtUtil.generateRefreshToken(user)).thenReturn(newRefreshToken);
+        when(refreshTokenRepository.findByToken("valid.refresh.token")).thenReturn(Optional.of(refreshTokenEntity));
+        when(jwtUtil.generateAccessToken(user)).thenReturn("new.access.token");
+        when(jwtUtil.generateRefreshToken(user)).thenReturn("new.refresh.token");
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(new RefreshToken());
 
         AuthResponse response = authService.refresh(request);
 
-        assertNotNull(response);
-        assertEquals(newAccessToken, response.accessToken());
-        assertEquals(newRefreshToken, response.refreshToken());
+        assertThat(response.accessToken()).isEqualTo("new.access.token");
+        assertThat(response.refreshToken()).isEqualTo("new.refresh.token");
+        verify(refreshTokenRepository).delete(refreshTokenEntity);
     }
 
     @Test
@@ -145,19 +153,22 @@ class AuthServiceTest {
         RefreshTokenRequest request = new RefreshTokenRequest("invalid.token");
         when(refreshTokenRepository.findByToken("invalid.token")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> authService.refresh(request));
+        assertThatThrownBy(() -> authService.refresh(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Token not found");
     }
 
     @Test
     void refresh_ShouldThrowExceptionWhenTokenExpired() {
-        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
+        RefreshTokenRequest request = new RefreshTokenRequest("expired.token");
         RefreshToken refreshTokenEntity = new RefreshToken();
-        refreshTokenEntity.setToken(refreshToken);
-        refreshTokenEntity.setUser(user);
+        refreshTokenEntity.setToken("expired.token");
         refreshTokenEntity.setExpiresAt(LocalDateTime.now().minusDays(1));
 
-        when(refreshTokenRepository.findByToken(refreshToken)).thenReturn(Optional.of(refreshTokenEntity));
+        when(refreshTokenRepository.findByToken("expired.token")).thenReturn(Optional.of(refreshTokenEntity));
 
-        assertThrows(BusinessException.class, () -> authService.refresh(request));
+        assertThatThrownBy(() -> authService.refresh(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Refresh token expired");
     }
 }
