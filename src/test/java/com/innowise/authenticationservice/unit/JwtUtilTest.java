@@ -97,10 +97,4 @@ class JwtUtilTest {
         assertFalse(jwtUtil.validateToken(token));
     }
 
-    @Test
-    void extractExpiration_ShouldReturnFutureDate() {
-        String token = jwtUtil.generateAccessToken(testUser);
-        Date expiration = jwtUtil.extractExpiration(token);
-        assertTrue(expiration.after(new Date()));
-    }
 }

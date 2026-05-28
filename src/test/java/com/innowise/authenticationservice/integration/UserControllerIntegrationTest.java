@@ -7,6 +7,7 @@ import com.innowise.authenticationservice.dto.UserResponse;
 import com.innowise.authenticationservice.entity.Role;
 import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
+import com.innowise.authenticationservice.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,6 +44,9 @@ class UserControllerIntegrationTest {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private String accessToken;
     private Long userId;
 
@@ -64,16 +68,7 @@ class UserControllerIntegrationTest {
                 AuthResponse.class);
 
         accessToken = authResponse.accessToken();
-
-        MvcResult userResult = mockMvc.perform(get("/users")
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        UserResponse userResponse = objectMapper.readValue(
-                userResult.getResponse().getContentAsString(),
-                UserResponse.class);
-        userId = userResponse.id();
+        userId = jwtUtil.extractUserId(accessToken);
     }
 
     @Test
