@@ -20,9 +20,6 @@ public class User{
     @NotBlank
     @Column(name = "password_hash")
     private String passwordHash;
-    @NotBlank
-    @Column(name = "salt")
-    private String salt;
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
@@ -31,11 +28,10 @@ public class User{
 
     public User() {}
 
-    public User(Long id, boolean active, Role role, String salt, String passwordHash, String login) {
+    public User(Long id, boolean active, Role role,  String passwordHash, String login) {
         this.id = id;
         this.active = active;
         this.role = role;
-        this.salt = salt;
         this.passwordHash = passwordHash;
         this.login = login;
     }

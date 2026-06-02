@@ -1,4 +1,4 @@
-package com.innowise.authenticationservice.service;
+package com.innowise.authenticationservice.unit;
 
 import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.RefreshTokenRequest;
@@ -11,6 +11,7 @@ import com.innowise.authenticationservice.exception.ResourceNotFoundException;
 import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import com.innowise.authenticationservice.security.JwtUtil;
+import com.innowise.authenticationservice.service.AuthServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,7 +40,7 @@ class AuthServiceTest {
     private JwtUtil jwtUtil;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Test
     void register_ShouldCreateUserAndReturnTokens() {
@@ -80,9 +81,8 @@ class AuthServiceTest {
         User user = new User();
         user.setId(1L);
         user.setLogin("testuser");
-        user.setSalt("testsalt");
-        String passwordWithSalt = "password123testsalt";
-        user.setPasswordHash(BCrypt.hashpw(passwordWithSalt, BCrypt.gensalt()));
+        String passwordHash = BCrypt.hashpw("password123", BCrypt.gensalt());
+        user.setPasswordHash(passwordHash);
         user.setRole(Role.USER);
         user.setActive(true);
 
@@ -113,8 +113,7 @@ class AuthServiceTest {
         UserRequest request = new UserRequest("testuser", "wrongpassword");
         User user = new User();
         user.setLogin("testuser");
-        user.setSalt("testsalt");
-        String correctPasswordHash = BCrypt.hashpw("correctpasswordtestsalt", BCrypt.gensalt());
+        String correctPasswordHash = BCrypt.hashpw("correctpassword", BCrypt.gensalt());
         user.setPasswordHash(correctPasswordHash);
 
         when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));

@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
 
         String message = ex.getBindingResult().getAllErrors().isEmpty()
                 ? "Validation failed"
-                : ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+                : ex.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
 
         ErrorResponseDto errorResponse = new ErrorResponseDto(
                 message,
@@ -109,5 +109,22 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorResponseDto> handleSecurityException(
+            SecurityException ex,
+            WebRequest request) {
+        log.error("Security error: {}", ex.getMessage());
+
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                request.getDescription(false).replace("uri=", ""),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }

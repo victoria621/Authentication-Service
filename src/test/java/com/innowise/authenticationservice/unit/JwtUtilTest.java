@@ -96,5 +96,4 @@ class JwtUtilTest {
     void validateToken_InvalidTokens_ShouldReturnFalse(String token) {
         assertFalse(jwtUtil.validateToken(token));
     }
-
 }

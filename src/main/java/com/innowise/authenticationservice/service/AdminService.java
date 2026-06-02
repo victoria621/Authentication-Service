@@ -1,123 +1,83 @@
 package com.innowise.authenticationservice.service;
 
 import com.innowise.authenticationservice.dto.*;
-import com.innowise.authenticationservice.entity.*;
-import com.innowise.authenticationservice.exception.ResourceNotFoundException;
-import com.innowise.authenticationservice.mapper.*;
-import com.innowise.authenticationservice.repository.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
-public class AdminService {
+/**
+ * Service interface for administrative operations.
+ * Handles management of users, orders, cards, payments and items.
+ * Accessible only to users with ADMIN role.
+ */
+public interface AdminService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
-    private final PaymentRepository paymentRepository;
-    private final PaymentMapper paymentMapper;
-    private final CardRepository cardRepository;
-    private final CardMapper cardMapper;
-    private final ItemRepository itemRepository;
-    private final ItemMapper itemMapper;
-    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
+    /**
+     * Retrieves all registered users.
+     *
+     * @return list of all user responses
+     */
+    List<UserResponse> getAllUsers();
 
-    public AdminService(
-                        UserRepository userRepository,
-                        UserMapper userMapper,
-                        OrderRepository orderRepository,
-                        OrderMapper orderMapper,
-                        PaymentRepository paymentRepository,
-                        PaymentMapper paymentMapper,
-                        CardRepository cardRepository,
-                        CardMapper cardMapper,
-                        ItemRepository itemRepository,
-                        ItemMapper itemMapper
-    ) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.orderRepository = orderRepository;
-        this.orderMapper = orderMapper;
-        this.paymentRepository = paymentRepository;
-        this.paymentMapper = paymentMapper;
-        this.cardRepository = cardRepository;
-        this.cardMapper = cardMapper;
-        this.itemRepository = itemRepository;
-        this.itemMapper = itemMapper;
-    }
+    /**
+     * Activates a user account by ID.
+     *
+     * @param id the user ID
+     * @throws com.innowise.authenticationservice.exception.ResourceNotFoundException if user not found
+     */
+    void activateUser(Long id);
 
+    /**
+     * Deactivates a user account by ID.
+     *
+     * @param id the user ID
+     * @throws com.innowise.authenticationservice.exception.ResourceNotFoundException if user not found
+     */
+    void deactivateUser(Long id);
 
-    public List<UserResponse> getAllUsers() {
-        List<User> allEntities = userRepository.findAll();
-        return allEntities.stream()
-                .map(userMapper::toDto)
-                .toList();
-    }
+    /**
+     * Retrieves all orders.
+     *
+     * @return list of all order responses
+     */
+    List<OrderResponse> getAllOrders();
 
-    @Transactional
-    public void activateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
-        user.setActive(true);
-        userRepository.save(user);
-    }
+    /**
+     * Retrieves all payments.
+     *
+     * @return list of all payment responses
+     */
+    List<PaymentResponse> getAllPayments();
 
-    @Transactional
-    public void deactivateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException (USER_NOT_FOUND_MESSAGE));
-        user.setActive(false);
-        userRepository.save(user);
-    }
+    /**
+     * Retrieves all cards.
+     *
+     * @return list of all card responses
+     */
+    List<CardResponse> getAllCards();
 
-    public List<OrderResponse> getAllOrders() {
-        List<Order> allOrder = orderRepository.findAll();
-        return allOrder.stream()
-                .map(orderMapper::toDto)
-                .toList();
-    }
+    /**
+     * Creates a new item.
+     *
+     * @param request the item creation request
+     * @return the created item response
+     */
+    ItemResponse createItem(ItemRequest request);
 
-    public List<PaymentResponse> getAllPayments() {
-        List<Payment> allPayments = paymentRepository.findAll();
-        return allPayments.stream()
-                .map(paymentMapper::toDto)
-                .toList();
-    }
+    /**
+     * Updates an existing item by ID.
+     *
+     * @param id the item ID
+     * @param request the item update request
+     * @return the updated item response
+     * @throws com.innowise.authenticationservice.exception.ResourceNotFoundException if item not found
+     */
+    ItemResponse updateItem(Long id, ItemRequest request);
 
-    public List<CardResponse> getAllCards() {
-        List<Card> allCards = cardRepository.findAll();
-        return  allCards.stream()
-                .map(cardMapper::toDto)
-                .toList();
-    }
-
-    @Transactional
-    public ItemResponse createItem(ItemRequest request) {
-        Item item = itemMapper.toEntity(request);
-        item.setCreatedAt(LocalDateTime.now());
-        Item savedItem = itemRepository.save(item);
-        return itemMapper.toDto(savedItem);
-    }
-
-    @Transactional
-    public ItemResponse updateItem(Long id, ItemRequest request) {
-        Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
-        itemMapper.updateEntity(request, item);
-        Item updatedItem = itemRepository.save(item);
-        return itemMapper.toDto(updatedItem);
-    }
-
-    @Transactional
-    public void deleteItem(Long id) {
-        if (!itemRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Item not found with id: " + id);
-        }
-        itemRepository.deleteById(id);
-    }
-
+    /**
+     * Deletes an item by ID.
+     *
+     * @param id the item ID
+     * @throws com.innowise.authenticationservice.exception.ResourceNotFoundException if item not found
+     */
+    void deleteItem(Long id);
 }

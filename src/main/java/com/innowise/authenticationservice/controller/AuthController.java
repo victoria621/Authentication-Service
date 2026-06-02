@@ -1,8 +1,6 @@
 package com.innowise.authenticationservice.controller;
 
-import com.innowise.authenticationservice.dto.AuthResponse;
-import com.innowise.authenticationservice.dto.RefreshTokenRequest;
-import com.innowise.authenticationservice.dto.UserRequest;
+import com.innowise.authenticationservice.dto.*;
 import com.innowise.authenticationservice.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for authentication operations.
+ * Provides endpoints for user registration, login, token refresh and token validation.
+ */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -20,23 +22,52 @@ public class AuthController {
     private final AuthService authService;
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
+    /**
+     * Registers a new user.
+     *
+     * @param request the user registration request containing login and password
+     * @return authentication response with access and refresh tokens
+     */
     @PostMapping("/register")
     public AuthResponse register(@RequestBody UserRequest request) {
         log.info("Registering user with login: {}", request.login());
         return authService.register(request);
     }
 
+    /**
+     * Authenticates a user and returns tokens.
+     *
+     * @param request the login request containing login and password
+     * @return authentication response with access and refresh tokens
+     */
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest request) {
         log.info("User logged in: {}", request.login());
         return authService.login(request);
     }
 
+    /**
+     * Refreshes an expired access token using a valid refresh token.
+     *
+     * @param request the refresh token request containing the refresh token
+     * @return authentication response with new access and refresh tokens
+     */
     @PostMapping("/refresh")
     public AuthResponse refresh(@RequestBody RefreshTokenRequest request) {
         log.info("Refreshing token for request: {}", request.refreshToken());
         return authService.refresh(request);
     }
 
-
+    /**
+     * Validates an access token.
+     *
+     * @param request the validation request containing the token to validate
+     * @return validation response indicating whether the token is valid
+     */
+    @PostMapping("/validate")
+    public ValidateTokenResponse validate(@RequestBody ValidateTokenRequest request) {
+        log.info("Validating token");
+        boolean isValid = authService.validateToken(request.token());
+        return new ValidateTokenResponse(isValid);
+    }
 }

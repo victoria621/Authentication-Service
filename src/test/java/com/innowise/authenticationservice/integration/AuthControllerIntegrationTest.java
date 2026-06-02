@@ -3,6 +3,8 @@ package com.innowise.authenticationservice.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.UserRequest;
+import com.innowise.authenticationservice.dto.ValidateTokenRequest;
+import com.innowise.authenticationservice.dto.ValidateTokenResponse;
 import com.innowise.authenticationservice.repository.RefreshTokenRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,5 +143,51 @@ class AuthControllerIntegrationTest {
         assertThat(refreshResponse.accessToken()).isNotNull();
         assertThat(refreshResponse.refreshToken()).isNotNull();
         assertThat(refreshResponse.refreshToken()).isNotEqualTo(refreshToken);
+    }
+
+    @Test
+    void validate_ShouldReturnTrue_WhenTokenIsValid() throws Exception {
+        UserRequest request = new UserRequest("validateuser", "password123");
+        MvcResult registerResult = mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        AuthResponse registerResponse = objectMapper.readValue(
+                registerResult.getResponse().getContentAsString(),
+                AuthResponse.class);
+
+        String accessToken = registerResponse.accessToken();
+        ValidateTokenRequest validateRequest = new ValidateTokenRequest(accessToken);
+
+        MvcResult validateResult = mockMvc.perform(post("/auth/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validateRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ValidateTokenResponse validateResponse = objectMapper.readValue(
+                validateResult.getResponse().getContentAsString(),
+                ValidateTokenResponse.class);
+
+        assertThat(validateResponse.valid()).isTrue();
+    }
+
+    @Test
+    void validate_ShouldReturnFalse_WhenTokenIsInvalid() throws Exception {
+        ValidateTokenRequest validateRequest = new ValidateTokenRequest("invalid.token.string");
+
+        MvcResult validateResult = mockMvc.perform(post("/auth/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validateRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ValidateTokenResponse validateResponse = objectMapper.readValue(
+                validateResult.getResponse().getContentAsString(),
+                ValidateTokenResponse.class);
+
+        assertThat(validateResponse.valid()).isFalse();
     }
 }

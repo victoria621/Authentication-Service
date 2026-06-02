@@ -5,7 +5,7 @@ import com.innowise.authenticationservice.entity.*;
 import com.innowise.authenticationservice.exception.ResourceNotFoundException;
 import com.innowise.authenticationservice.mapper.*;
 import com.innowise.authenticationservice.repository.*;
-import com.innowise.authenticationservice.service.AdminService;
+import com.innowise.authenticationservice.service.AdminServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,7 +55,7 @@ class AdminServiceTest {
     private ItemMapper itemMapper;
 
     @InjectMocks
-    private AdminService adminService;
+    private AdminServiceImpl adminService;
 
     private User user;
     private UserResponse userResponse;
@@ -128,7 +128,7 @@ class AdminServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("admin", result.get(0).login());
+        assertEquals("admin", result.getFirst().login());
     }
 
     @Test
@@ -169,7 +169,7 @@ class AdminServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(BigDecimal.valueOf(200.0), result.get(0).totalPrice());
+        assertEquals(BigDecimal.valueOf(200.0), result.getFirst().totalPrice());
     }
 
     @Test
@@ -181,7 +181,7 @@ class AdminServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(BigDecimal.valueOf(200.0), result.get(0).amount());
+        assertEquals(BigDecimal.valueOf(200.0), result.getFirst().amount());
     }
 
     @Test
@@ -193,7 +193,7 @@ class AdminServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("1234-5678", result.get(0).cardNumber());
+        assertEquals("1234-5678", result.getFirst().cardNumber());
     }
 
     @Test

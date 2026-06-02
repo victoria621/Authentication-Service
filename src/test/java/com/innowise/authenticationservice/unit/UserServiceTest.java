@@ -14,7 +14,7 @@ import com.innowise.authenticationservice.repository.CardRepository;
 import com.innowise.authenticationservice.repository.OrderRepository;
 import com.innowise.authenticationservice.repository.PaymentRepository;
 import com.innowise.authenticationservice.repository.UserRepository;
-import com.innowise.authenticationservice.service.UserService;
+import com.innowise.authenticationservice.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,7 +57,7 @@ class UserServiceTest {
     private PaymentMapper paymentMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Test
     void getUserById_ShouldReturnUserResponse_WhenUserExists() {
@@ -98,7 +98,7 @@ class UserServiceTest {
         List<CardResponse> result = userService.getMyCards(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).cardNumber()).isEqualTo("1234567890123456");
+        assertThat(result.getFirst().cardNumber()).isEqualTo("1234567890123456");
     }
 
     @Test
@@ -124,7 +124,7 @@ class UserServiceTest {
         List<OrderResponse> result = userService.getMyOrders(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).totalPrice()).isEqualByComparingTo("100");
+        assertThat(result.getFirst().totalPrice()).isEqualByComparingTo("100");
     }
 
     @Test
@@ -153,7 +153,7 @@ class UserServiceTest {
         List<PaymentResponse> result = userService.getMyPayments(1L);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).amount()).isEqualByComparingTo("100");
+        assertThat(result.getFirst().amount()).isEqualByComparingTo("100");
     }
 
     @Test
