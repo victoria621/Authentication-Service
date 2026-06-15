@@ -1,8 +1,7 @@
 package com.innowise.authenticationservice.service;
 
-import com.innowise.authenticationservice.dto.AuthResponse;
-import com.innowise.authenticationservice.dto.RefreshTokenRequest;
-import com.innowise.authenticationservice.dto.UserRequest;
+import com.innowise.authenticationservice.client.UserServiceClient;
+import com.innowise.authenticationservice.dto.*;
 import com.innowise.authenticationservice.entity.RefreshToken;
 import com.innowise.authenticationservice.entity.Role;
 import com.innowise.authenticationservice.entity.User;
@@ -23,11 +22,14 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserServiceClient userServiceClient;
 
-    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
+    public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil,
+                           RefreshTokenRepository refreshTokenRepository,UserServiceClient userServiceClient) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userServiceClient = userServiceClient;
     }
 
     @Override
@@ -111,5 +113,44 @@ public class AuthServiceImpl implements AuthService {
     private void deleteOldRefreshTokens(User user) {
         refreshTokenRepository.deleteAllByUser(user);
         refreshTokenRepository.flush();
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse registerWithRollback(UserWithProfileRequest request) {
+
+        if (userRepository.findByLogin(request.login()).isPresent()) {
+            throw new BusinessException("Login already exists");
+        }
+
+        String passwordHash = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+        User user = new User();
+        user.setLogin(request.login());
+        user.setPasswordHash(passwordHash);
+        user.setRole(Role.USER);
+        user.setActive(true);
+
+        User savedUser = userRepository.save(user);
+
+        try {
+            CreateUserProfileRequest profileRequest = new CreateUserProfileRequest(
+                    savedUser.getId(),
+                    request.login(),
+                    request.email(),
+                    request.firstName(),
+                    request.lastName()
+            );
+            userServiceClient.createUserProfile(profileRequest);
+
+        } catch (Exception e) {
+            userRepository.delete(savedUser);
+            throw new BusinessException("Registration failed: " + e.getMessage());
+        }
+
+        String accessToken = jwtUtil.generateAccessToken(savedUser);
+        String refreshToken = jwtUtil.generateRefreshToken(savedUser);
+        saveRefreshToken(refreshToken, savedUser);
+
+        return new AuthResponse(accessToken, refreshToken);
     }
 }

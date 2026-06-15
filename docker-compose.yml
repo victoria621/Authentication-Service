@@ -22,7 +22,7 @@ services:
     build: .
     container_name: auth_app
     ports:
-      - "8080:8080"
+      - "8082:8082"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
       SPRING_DATASOURCE_USERNAME: postgres

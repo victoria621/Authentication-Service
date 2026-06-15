@@ -3,6 +3,7 @@ package com.innowise.authenticationservice.service;
 import com.innowise.authenticationservice.dto.AuthResponse;
 import com.innowise.authenticationservice.dto.RefreshTokenRequest;
 import com.innowise.authenticationservice.dto.UserRequest;
+import com.innowise.authenticationservice.dto.UserWithProfileRequest;
 
 /**
  * Service interface for authentication operations.
@@ -45,4 +46,20 @@ public interface AuthService {
      * @return true if token is valid, false otherwise
      */
     boolean validateToken(String token);
+
+    /**
+     * Registers a new user with automatic profile creation in User Service.
+     * This method performs a transactional registration:
+     * <ol>
+     *   <li>Saves user credentials in Authentication Service database</li>
+     *   <li>Calls User Service to create user profile (email, firstName, lastName)</li>
+     *   <li>If User Service call fails, rolls back the user deletion from Authentication Service</li>
+     * </ol>
+     *
+     * @param request the registration request containing login, password and profile data
+     * @return authentication response with access and refresh tokens
+     * @throws com.innowise.authenticationservice.exception.BusinessException if login already exists
+     * @throws RuntimeException if User Service call fails (triggers rollback)
+     */
+    AuthResponse registerWithRollback(UserWithProfileRequest request);
 }

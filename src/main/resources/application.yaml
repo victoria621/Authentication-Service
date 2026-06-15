@@ -13,10 +13,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: 8080
+  port: 8082
+
+user:
+  service:
+    url: http://localhost:8080
 
 jwt:
-  secret: mySuperSecretKey1234567890123456789012345678901234567890
+  secret: ZWQ4NzIwODQtNWYyNy00ODhmLThkN2MtNzAzMDc3MTQzYWI5ZjZjMWEwNjEtMTBhYS00ZWY3LTljODItYjAzN2VjY2M5ZDRj
   access-expiration: 900000
   refresh-expiration: 604800000
 

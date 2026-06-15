@@ -70,4 +70,16 @@ public class AuthController {
         boolean isValid = authService.validateToken(request.token());
         return new ValidateTokenResponse(isValid);
     }
+
+    /**
+     * Registers a new user with automatic profile creation in User Service.
+     * @param request the registration request containing login, password and profile data
+     * @return authentication response with access and refresh tokens
+     * @throws com.innowise.authenticationservice.exception.BusinessException if login already exists or User Service call fails
+     */
+    @PostMapping("/register-with-rollback")
+    public AuthResponse registerWithRollback(@RequestBody UserWithProfileRequest request) {
+        log.info("Registering user with rollback: {}", request.login());
+        return authService.registerWithRollback(request);
+    }
 }
