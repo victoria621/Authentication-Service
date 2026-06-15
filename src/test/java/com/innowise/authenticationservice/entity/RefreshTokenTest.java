@@ -1,9 +1,12 @@
 package com.innowise.authenticationservice.entity;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
+
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class RefreshTokenTest {
 
     @Test

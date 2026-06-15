@@ -5,12 +5,14 @@ import com.innowise.authenticationservice.dto.ItemResponse;
 import com.innowise.authenticationservice.entity.Item;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class ItemMapperTest {
 
     private final ItemMapper itemMapper = Mappers.getMapper(ItemMapper.class);

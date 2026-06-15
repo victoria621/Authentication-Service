@@ -5,12 +5,14 @@ import com.innowise.authenticationservice.entity.Payment;
 import com.innowise.authenticationservice.entity.PaymentStatus;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class PaymentMapperTest {
 
     private final PaymentMapper paymentMapper = Mappers.getMapper(PaymentMapper.class);

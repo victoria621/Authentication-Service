@@ -5,12 +5,14 @@ import com.innowise.authenticationservice.entity.Order;
 import com.innowise.authenticationservice.entity.OrderStatus;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class OrderMapperTest {
 
     private final OrderMapper orderMapper = Mappers.getMapper(OrderMapper.class);

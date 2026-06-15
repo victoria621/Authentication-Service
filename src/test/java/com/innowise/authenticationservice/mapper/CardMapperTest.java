@@ -4,9 +4,11 @@ import com.innowise.authenticationservice.dto.CardResponse;
 import com.innowise.authenticationservice.entity.Card;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 class CardMapperTest {
 
     private final CardMapper cardMapper = Mappers.getMapper(CardMapper.class);
