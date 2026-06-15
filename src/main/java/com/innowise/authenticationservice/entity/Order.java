@@ -21,6 +21,7 @@ public class Order {
         @Column(name = "total_price")
         private BigDecimal totalPrice;
         @Column(name = "status")
+        @Enumerated(EnumType.STRING)
         private OrderStatus status;
         @Column(name = "created_at")
         private LocalDateTime createdAt;
