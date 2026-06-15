@@ -20,3 +20,7 @@ jwt:
   secret: testSecretKeyForIntegrationTestsAtLeast32Chars
   access-expiration: 900000
   refresh-expiration: 604800000
+
+user:
+  service:
+    url: http://localhost:8080
