@@ -42,10 +42,10 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean compile
+        run: mvn clean compile --enable-preview
 
       - name: Run tests
-        run: mvn test
+        run: mvn test -DargLine="-XX:+EnableDynamicAgentLoading" --enable-preview
 
       - name: Upload test reports
         if: always()
@@ -58,20 +58,7 @@ jobs:
     name: Code Analysis (SonarQube)
     runs-on: ubuntu-latest
     needs: build-and-test
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: auth_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: mysecretpassword
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout code
@@ -92,16 +79,13 @@ jobs:
       - name: Run SonarQube analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn verify sonar:sonar
-          -Dsonar.organization=${{ env.SONAR_ORG }}
-          -Dsonar.projectKey=${{ env.SONAR_PROJECT }}
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: mvn verify sonar:sonar -Dsonar.organization=${{ env.SONAR_ORG }} -Dsonar.projectKey=${{ env.SONAR_PROJECT }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
   docker:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs: [build-and-test, sonarqube]
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code

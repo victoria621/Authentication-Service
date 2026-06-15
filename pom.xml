@@ -14,7 +14,10 @@
     <name>Authentication Service</name>
     <description>Authentication Service with JWT</description>
 	<properties>
-		<java.version>21</java.version>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <jjwt.version>0.12.6</jjwt.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
@@ -112,6 +115,13 @@
                     <source>21</source>
                     <target>21</target>
                     <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>--enable-preview</argLine>
                 </configuration>
             </plugin>
             <plugin>
