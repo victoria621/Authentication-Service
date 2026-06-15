@@ -42,10 +42,10 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean compile --enable-preview
+        run: mvn clean compile
 
       - name: Run tests
-        run: mvn test -DargLine="-XX:+EnableDynamicAgentLoading" --enable-preview
+        run: mvn test -DargLine="-XX:+EnableDynamicAgentLoading"
 
       - name: Upload test reports
         if: always()
