@@ -34,7 +34,7 @@ class ItemMapperTest {
         item.setName("Mouse");
         item.setDescription("Wireless mouse");
         item.setPrice(BigDecimal.valueOf(29.99));
-        item.setCreatedAt(LocalDateTime.now());
+        item.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         ItemResponse response = itemMapper.toDto(item);
 

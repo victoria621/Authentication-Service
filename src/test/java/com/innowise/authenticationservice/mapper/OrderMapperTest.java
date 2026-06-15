@@ -22,7 +22,7 @@ class OrderMapperTest {
         order.setUserId(5L);
         order.setTotalPrice(BigDecimal.valueOf(99.99));
         order.setStatus(OrderStatus.PAID);
-        order.setCreatedAt(LocalDateTime.now());
+        order.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         OrderResponse response = orderMapper.toDto(order);
 

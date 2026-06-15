@@ -84,9 +84,9 @@ class AdminServiceTest {
         order.setUserId(2L);
         order.setTotalPrice(BigDecimal.valueOf(200.0));
         order.setStatus(OrderStatus.PAID);
-        order.setCreatedAt(LocalDateTime.now());
+        order.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
-        orderResponse = new OrderResponse(1L, 2L, BigDecimal.valueOf(200.0), OrderStatus.PAID, LocalDateTime.now());
+        orderResponse = new OrderResponse(1L, 2L, BigDecimal.valueOf(200.0), OrderStatus.PAID, LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         payment = new Payment();
         payment.setId(1L);
@@ -94,9 +94,9 @@ class AdminServiceTest {
         payment.setAmount(BigDecimal.valueOf(200.0));
         payment.setStatus(PaymentStatus.COMPLETED);
         payment.setPaymentMethod("CARD");
-        payment.setCreatedAt(LocalDateTime.now());
+        payment.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
-        paymentResponse = new PaymentResponse(1L, 1L, BigDecimal.valueOf(200.0), PaymentStatus.COMPLETED, "CARD", LocalDateTime.now());
+        paymentResponse = new PaymentResponse(1L, 1L, BigDecimal.valueOf(200.0), PaymentStatus.COMPLETED, "CARD", LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         card = new Card();
         card.setId(1L);
@@ -112,9 +112,9 @@ class AdminServiceTest {
         item.setName("Test Item");
         item.setDescription("Test Description");
         item.setPrice(BigDecimal.valueOf(99.99));
-        item.setCreatedAt(LocalDateTime.now());
+        item.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
-        itemResponse = new ItemResponse(1L, "Test Item", "Test Description", BigDecimal.valueOf(99.99), LocalDateTime.now());
+        itemResponse = new ItemResponse(1L, "Test Item", "Test Description", BigDecimal.valueOf(99.99), LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         itemRequest = new ItemRequest("Test Item", "Test Description", BigDecimal.valueOf(99.99));
     }

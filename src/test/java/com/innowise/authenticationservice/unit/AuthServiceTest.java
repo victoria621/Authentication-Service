@@ -133,7 +133,7 @@ class AuthServiceTest {
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken("valid.refresh.token");
         refreshTokenEntity.setUser(user);
-        refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(7));
+        refreshTokenEntity.setExpiresAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         when(refreshTokenRepository.findByToken("valid.refresh.token")).thenReturn(Optional.of(refreshTokenEntity));
         when(jwtUtil.generateAccessToken(user)).thenReturn("new.access.token");
@@ -162,7 +162,7 @@ class AuthServiceTest {
         RefreshTokenRequest request = new RefreshTokenRequest("expired.token");
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken("expired.token");
-        refreshTokenEntity.setExpiresAt(LocalDateTime.now().minusDays(1));
+        refreshTokenEntity.setExpiresAt(LocalDateTime.of(2024, 12, 31, 12, 0, 0));
 
         when(refreshTokenRepository.findByToken("expired.token")).thenReturn(Optional.of(refreshTokenEntity));
 

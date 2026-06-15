@@ -1,6 +1,7 @@
 package com.innowise.authenticationservice.client;
 
 import com.innowise.authenticationservice.dto.CreateUserProfileRequest;
+import com.innowise.authenticationservice.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ public class UserServiceClient {
                 .build();
     }
 
-    public void createUserProfile(CreateUserProfileRequest request) {
+    public void createUserProfile(CreateUserProfileRequest request) throws BusinessException {
         try {
             webClient.post()
                     .uri("/api/users")
@@ -32,10 +33,10 @@ public class UserServiceClient {
             log.info("User profile created successfully for userId: {}", request.userId());
         } catch (WebClientResponseException e) {
             log.error("User Service error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("User Service error: " + e.getStatusCode());
+            throw new BusinessException(STR."User Service error: \{e.getStatusCode()}");
         } catch (Exception e) {
             log.error("Error calling User Service: {}", e.getMessage());
-            throw new RuntimeException("User Service unavailable: " + e.getMessage());
+            throw new BusinessException(STR."User Service unavailable: \{e.getMessage()}");
         }
     }
 }

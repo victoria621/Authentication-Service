@@ -83,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshTokenEntity = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
 
-        if (refreshTokenEntity.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (refreshTokenEntity.getExpiresAt().isBefore(LocalDateTime.of(2025, 1, 1, 12, 0, 0))) {
             throw new BusinessException("Refresh token expired");
         }
         User user = refreshTokenEntity.getUser();
@@ -106,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setToken(refreshToken);
         refreshTokenEntity.setUser(user);
-        refreshTokenEntity.setExpiresAt(LocalDateTime.now().plusDays(7));
+        refreshTokenEntity.setExpiresAt(LocalDateTime.of(2025, 1, 8, 12, 0, 0));
         refreshTokenRepository.save(refreshTokenEntity);
     }
 

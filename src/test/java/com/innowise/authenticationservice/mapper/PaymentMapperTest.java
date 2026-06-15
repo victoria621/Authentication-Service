@@ -23,7 +23,7 @@ class PaymentMapperTest {
         payment.setAmount(BigDecimal.valueOf(49.99));
         payment.setStatus(PaymentStatus.COMPLETED);
         payment.setPaymentMethod("CARD");
-        payment.setCreatedAt(LocalDateTime.now());
+        payment.setCreatedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0));
 
         PaymentResponse response = paymentMapper.toDto(payment);
 

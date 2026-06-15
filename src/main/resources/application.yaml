@@ -20,7 +20,7 @@ user:
     url: http://localhost:8080
 
 jwt:
-  secret: ZWQ4NzIwODQtNWYyNy00ODhmLThkN2MtNzAzMDc3MTQzYWI5ZjZjMWEwNjEtMTBhYS00ZWY3LTljODItYjAzN2VjY2M5ZDRj
+  secret: ${JWT_SECRET:ZWQ4NzIwODQtNWYyNy00ODhmLThkN2MtNzAzMDc3MTQzYWI5ZjZjMWEwNjEtMTBhYS00ZWY3LTljODItYjAzN2VjY2M5ZDRj}
   access-expiration: 900000
   refresh-expiration: 604800000
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemUTC())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
@@ -45,7 +46,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT.value(),
                 "Conflict",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemDefaultZone())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
@@ -67,7 +68,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemDefaultZone())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -88,7 +89,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemDefaultZone())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -105,7 +106,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemDefaultZone())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -122,7 +123,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED.value(),
                 "Unauthorized",
                 request.getDescription(false).replace("uri=", ""),
-                LocalDateTime.now()
+                LocalDateTime.now(Clock.systemDefaultZone())
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);

@@ -15,7 +15,7 @@ class RefreshTokenTest {
         token.setId(1L);
         token.setToken("test-token-123");
         token.setUser(user);
-        token.setExpiresAt(LocalDateTime.now().plusDays(7));
+        token.setExpiresAt(LocalDateTime.of(2025, 1, 8, 12, 0, 0));
 
         assertThat(token.getId()).isEqualTo(1L);
         assertThat(token.getToken()).isEqualTo("test-token-123");
@@ -28,7 +28,7 @@ class RefreshTokenTest {
         User user = new User();
         user.setId(1L);
 
-        LocalDateTime expiresAt = LocalDateTime.now().plusDays(7);
+        LocalDateTime expiresAt = LocalDateTime.of(2025, 1, 7, 12, 0, 0);
         RefreshToken token = new RefreshToken(1L, user, "test-token", expiresAt);
 
         assertThat(token.getId()).isEqualTo(1L);
