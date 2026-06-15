@@ -15,16 +15,6 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: auth_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: mysecretpassword
-        ports:
-          - 5432:5432
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,9 +25,6 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-
-      - name: Wait for PostgreSQL
-        run: sleep 15
 
       - name: Build with Maven
         run: mvn clean compile
